@@ -71,7 +71,7 @@ public class CameraCapture : MonoBehaviour
         ResetCamera(cam, bgColor, flags, destroy);
 
 #if USING_URP
-        ResetCameraData(camData, rendererIndex);
+        //ResetCameraData(camData, rendererIndex);
 #endif
 
         return render;
