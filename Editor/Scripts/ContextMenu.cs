@@ -80,13 +80,8 @@ internal static partial class ContextMenu
                 var timestamp = $"{DateTime.Now:yy-MM-dd})({DateTime.Now:HH-mm-ss}";
                 var camName = $"/{cam.gameObject.name}[{cam.GetHashCode()}]({timestamp}).png";
                 var path = $"{cam.lastPath}{camName}";
-
-#if USING_URP
-            cam.RenderAndSaveUrp(path, SaveValues.Screenshot.RenderPipelineAssetPath,
-                                 AssetDatabase.GUIDFromAssetPath(SaveValues.Screenshot.RendererDataPath));
-#else
+                
                 cam.RenderAndSave(path);
-#endif
             }
 
             Debug.Log($"{activeCams.Count} CameraCapture components rendered.");
