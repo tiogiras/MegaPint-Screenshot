@@ -33,13 +33,6 @@ internal static partial class ContextMenu
             package = PackageKey.Screenshot, signature = "Window Capture"
         };
 
-#if USING_URP
-        private static readonly MenuItemSignature s_transparencyWizardSignature = new()
-        {
-            package = PackageKey.Screenshot, signature = "Transparency Wizard"
-        };
-#endif
-
         #region Private Methods
 
         [MenuItem(MenuItemPackages + "/Screenshot/Capture Now _F12", false, 100)]
@@ -101,14 +94,6 @@ internal static partial class ContextMenu
         {
             TryOpen <WindowCapture>(false, s_windowCaptureSignature);
         }
-
-#if USING_URP
-        [MenuItem(MenuItemPackages + "/Screenshot/Transparency Wizard", false, 140)]
-        private static void TransparencyWizard()
-        {
-            TryOpen <TransparencyWizard>(true, s_transparencyWizardSignature);
-        }
-#endif
 
         #endregion
     }

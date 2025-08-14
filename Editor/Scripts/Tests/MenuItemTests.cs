@@ -24,14 +24,6 @@ internal class MenuItemTests
         TestsUtility.ValidateMenuItemLink(Constants.Screenshot.Links.ShortcutCapture, typeof(ShortcutCapture));
     }
 
-#if USING_URP
-    [Test]
-    public void TransparencyWizard()
-    {
-        TestsUtility.ValidateMenuItemLink(Constants.Screenshot.Links.TransparencyWizard, typeof(TransparencyWizard));
-    }
-#endif
-
     [Test]
     public void WindowCapture()
     {

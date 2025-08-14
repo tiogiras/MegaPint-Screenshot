@@ -1,8 +1,4 @@
-﻿#if USING_URP
-using UnityEngine.Rendering.Universal;
-#endif
-
-#if USING_HDRP
+﻿#if USING_HDRP
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 #endif
@@ -129,74 +125,6 @@ internal static class ScreenshotUtility
 #endif
 #endif
     }
-
-#if USING_URP
-#if UNITY_EDITOR
-    /// <summary> Try to get the index of the scriptable renderer used as transparency renderer </summary>
-    /// <param name="renderPipelineAssetPath"> Path to the renderPipelineAsset </param>
-    /// <param name="renderer"> GUID of the renderer </param>
-    /// <param name="index"> Output index of the renderer </param>
-    /// <returns> If the index was found </returns>
-    public static bool TryGetScriptableRendererIndex(string renderPipelineAssetPath, GUID renderer, out int index)
-    {
-        EditorUtility.SetDirty(AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(renderPipelineAssetPath));
-        AssetDatabase.SaveAssets();
-        
-        var guid = renderer.ToString();
-        var lines = File.ReadAllLines(renderPipelineAssetPath);
-
-        var foundRenderers = false;
-
-        index = 0;
-        
-        foreach (var line in lines)
-        {
-            if (!foundRenderers)
-            {
-                foundRenderers = line.StartsWith("  m_RendererDataList:");
-                continue;
-            }
-            
-            if (!line.StartsWith("  - {fileID:"))
-                break;
-
-            if (line.Contains(guid))
-                return true;
-
-            index++;
-        }
-
-        return false;
-    }
-
-    /// <summary> Try to get the index of the scriptable renderer used as transparency renderer </summary>
-    /// <param name="renderPipelineAssetPath"> Path to the renderPipelineAsset </param>
-    /// <param name="renderer"> GUID of the renderer </param>
-    /// <param name="index"> Output index of the renderer </param>
-    /// <returns> If the index was found </returns>
-    public static bool TryGetScriptableRendererIndex(string renderPipelineAssetPath, ScriptableRenderer renderer, out int index)
-    {
-        var pipelineAsset =
-            AssetDatabase.LoadAssetAtPath <UniversalRenderPipelineAsset>(renderPipelineAssetPath);
-
-        index = 0;
-        while (true)
-        {
-            ScriptableRenderer scriptableRenderer = pipelineAsset.GetRenderer(index);
-
-            if (scriptableRenderer == null)
-                break;
-
-            if (scriptableRenderer == renderer)
-                return true;
-
-            index++;
-        }
-
-        return false;
-    }
-#endif
-#endif
 
     #endregion
 }

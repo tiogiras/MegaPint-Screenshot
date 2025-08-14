@@ -4,8 +4,11 @@ using UnityEngine.Rendering.HighDefinition;
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -69,6 +72,26 @@ public class CameraCapture : MonoBehaviour
             out Color bgColor,
             out CameraClearFlags flags,
             out List <GameObject> destroy);
+
+#if USING_URP
+
+        var resetAlphaToFalse = false;
+        
+        var renderPipeline = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+        
+        if (backgroundType != BackgroundType.None)
+        {
+            if (!renderPipeline?.allowPostProcessAlphaOutput ?? true)
+            {
+                var alphaOutputField = typeof(UniversalRenderPipelineAsset)
+                    .GetField("m_AllowPostProcessAlphaOutput", BindingFlags.NonPublic | BindingFlags.Instance);
+                    
+                alphaOutputField?.SetValue(renderPipeline, true);
+
+                resetAlphaToFalse = true;
+            }
+        }
+#endif
         
 #if USING_HDRP
         var camDataHdrp = GetComponent <HDAdditionalCameraData>();
@@ -90,6 +113,16 @@ public class CameraCapture : MonoBehaviour
 #endif
 
         ResetCamera(cam, bgColor, flags, destroy);
+        
+#if USING_URP
+        if (resetAlphaToFalse)
+        {
+            var alphaOutputField = typeof(UniversalRenderPipelineAsset)
+                .GetField("m_AllowPostProcessAlphaOutput", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            alphaOutputField?.SetValue(renderPipeline, false);
+        }
+#endif
         
 #if USING_HDRP
         ResetCameraData(camDataHdrp, colorMode, bgColorHDR, colorBuffer);
