@@ -342,8 +342,8 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
         _render = await _target.Render();
 
         _preview.style.backgroundImage = _render;
-        _preview.aspectRatioX = width / gcd;
-        _preview.aspectRatioY = height / gcd;
+        _preview.AspectRatioX = width / gcd;
+        _preview.AspectRatioY = height / gcd;
         _preview.FitToParent();
 
         _btnSave.style.display = DisplayStyle.Flex;

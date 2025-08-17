@@ -45,7 +45,7 @@ internal static partial class ContextMenu
         return;
 #endif
 
-            List <CameraCapture> cams = Object.FindObjectsOfType <CameraCapture>().ToList();
+            List <CameraCapture> cams = Object.FindObjectsByType <CameraCapture>(FindObjectsSortMode.InstanceID).ToList();
 
             if (cams.Count == 0)
             {
