@@ -17,12 +17,6 @@
                     <MegaPint.Editor.Scripts.GUI.Factories.TextElements.TextSecondary tabindex="-1" text="1920 x 1080" tooltip="Resolution of the selected background image." name="ImageResolution" style="margin-left: 15px; font-size: 10px;" />
                     <ui:DropdownField label="Image Type" index="0" choices="Simple, Tiled" name="ImageType" tooltip="Image type of the background image, based on the Image component." class="mp_font mp_textColor_normal mp_dropdown" />
                     <ui:FloatField label="Pixel Per Unit" value="1" name="PixelPerUnit" tooltip="Pixel per unit of the background image, based on the image component." class="mp_font mp_textColor_normal mp_inputField" />
-                    <ui:VisualElement name="TransparencyHint" style="flex-grow: 1; margin-top: 10px;">
-                        <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
-                        <ui:Foldout text="Hint: Transparency" value="false" class="mp_font" style="background-color: rgba(255, 255, 255, 0.08); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; -unity-font-style: bold; margin-left: 0; margin-top: 2px; padding-left: 20px;">
-                            <MegaPint.Editor.Scripts.GUI.Factories.TextElements.Text tabindex="-1" text="You are using urp and post processing is enabled on this camera if you notice issues rendering transparency run the transparency wizard." style="white-space: normal; margin-right: 3px; margin-bottom: 3px;" />
-                        </ui:Foldout>
-                    </ui:VisualElement>
                     <ui:VisualElement name="TransparencyHintHDRP" focusable="false" style="flex-grow: 1; margin-top: 10px;">
                         <MegaPint.Editor.Scripts.GUI.Factories.Structure.Separator />
                         <ui:IntegerField label="Exposure Time" value="250" tooltip="Frames taken to render the image." name="ExposureTime" class="mp_inputField" />

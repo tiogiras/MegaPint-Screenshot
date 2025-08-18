@@ -179,8 +179,8 @@ internal class WindowCapture : EditorWindowBase
         _render = result;
 
         _preview.style.backgroundImage = _render;
-        _preview.aspectRatioX = (int)width / gcd;
-        _preview.aspectRatioY = (int)height / gcd;
+        _preview.AspectRatioX = (int)width / gcd;
+        _preview.AspectRatioY = (int)height / gcd;
         _preview.FitToParent();
 
         _btnSave.style.display = DisplayStyle.Flex;

@@ -8,8 +8,10 @@ using UnityEngine.Rendering.HighDefinition;
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -58,13 +60,6 @@ public class CameraCapture : MonoBehaviour
     public int exposureTime = 250;
 #endif
 
-#if USING_URP
-    private string _renderPipelineAssetPath;
-#if UNITY_EDITOR
-      private GUID _transparencyRenderer;
-#endif
-#endif
-
     #region Public Methods
 
     /// <summary> Render the camera's image </summary>
@@ -82,10 +77,25 @@ public class CameraCapture : MonoBehaviour
             out List <GameObject> destroy);
 
 #if USING_URP
-        UniversalAdditionalCameraData camData = cam.GetUniversalAdditionalCameraData();
 
-        PrepareCameraData(camData, out var rendererIndex);
+        var resetAlphaToFalse = false;
+        
+        var renderPipeline = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+        
+        if (backgroundType != BackgroundType.None)
+        {
+            if (!renderPipeline?.allowPostProcessAlphaOutput ?? true)
+            {
+                var alphaOutputField = typeof(UniversalRenderPipelineAsset)
+                    .GetField("m_AllowPostProcessAlphaOutput", BindingFlags.NonPublic | BindingFlags.Instance);
+                    
+                alphaOutputField?.SetValue(renderPipeline, true);
+
+                resetAlphaToFalse = true;
+            }
+        }
 #endif
+        
 #if USING_HDRP
         var camDataHdrp = GetComponent <HDAdditionalCameraData>();
 
@@ -106,10 +116,17 @@ public class CameraCapture : MonoBehaviour
 #endif
 
         ResetCamera(cam, bgColor, flags, destroy);
-
+        
 #if USING_URP
-        ResetCameraData(camData, rendererIndex);
+        if (resetAlphaToFalse)
+        {
+            var alphaOutputField = typeof(UniversalRenderPipelineAsset)
+                .GetField("m_AllowPostProcessAlphaOutput", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            alphaOutputField?.SetValue(renderPipeline, false);
+        }
 #endif
+        
 #if USING_HDRP
         ResetCameraData(camDataHdrp, colorMode, bgColorHDR, colorBuffer);
 #endif
@@ -123,47 +140,6 @@ public class CameraCapture : MonoBehaviour
     {
         Save(await Render(), path);
     }
-
-#if UNITY_EDITOR
-    /// <summary> Render the camera and save </summary>
-    /// <param name="path"> Export path </param>
-    /// <param name="renderPipelineAssetPath"> Path to the renderPipelineAsset </param>
-    /// <param name="transparencyRenderer"> Path to the renderer </param>
-    public async void RenderAndSaveUrp(
-        string path,
-        string renderPipelineAssetPath,
-        GUID transparencyRenderer)
-    {
-        Save(await RenderUrp(renderPipelineAssetPath, transparencyRenderer), path);
-    }
-
-    /// <summary> Render the camera's image </summary>
-    /// <param name="renderPipelineAssetPath"> Path to the renderPipelineAsset </param>
-    /// <param name="transparencyRenderer"> Path to the renderer </param>
-    /// <returns> Rendered image </returns>
-    public async Task <Texture2D> RenderUrp(
-        string renderPipelineAssetPath,
-        GUID transparencyRenderer)
-    {
-#if USING_URP
-        var isUrpAsset = QualitySettings.renderPipeline is UniversalRenderPipelineAsset;
-
-        if (!isUrpAsset &&
-            backgroundType is BackgroundType.Transparent or BackgroundType.SolidColor or BackgroundType.Image)
-        {
-            Debug.LogWarning(
-                "You have no UniversalRenderPipelineAsset selected in you Quality settings. Therefor the camera can't render modes with possible transparency.");
-
-            return null;
-        }
-        
-        _renderPipelineAssetPath = renderPipelineAssetPath;
-        _transparencyRenderer = transparencyRenderer;
-#endif
-
-        return await Render();
-    }
-#endif
 
     /// <summary> Save the rendered image </summary>
     /// <param name="texture"> Texture to save </param>
@@ -277,44 +253,7 @@ public class CameraCapture : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
     }
-
-#if USING_URP
-    /// <summary> Prepare the camera data to render </summary>
-    /// <param name="camData"> Targeted camera data </param>
-    /// <param name="rendererIndex"> Index of the transparency renderer </param>
-    private void PrepareCameraData(UniversalAdditionalCameraData camData, out int rendererIndex)
-    {
-        rendererIndex = -1;
-
-        if (backgroundType is BackgroundType.None || !camData.renderPostProcessing)
-            return;
-
-#if UNITY_EDITOR
-        if (string.IsNullOrEmpty(_renderPipelineAssetPath) || _transparencyRenderer.Empty())
-            return;
-
-        if (!ScreenshotUtility.TryGetScriptableRendererIndex(_renderPipelineAssetPath,
-                camData.scriptableRenderer, out rendererIndex))
-            return;
-
-        if (ScreenshotUtility.TryGetScriptableRendererIndex(_renderPipelineAssetPath,
-                _transparencyRenderer, out var index))
-            camData.SetRenderer(index);
-#endif
-    }
     
-    private void ResetCameraData(UniversalAdditionalCameraData camData, int rendererIndex)
-    {
-        if (backgroundType is BackgroundType.None || !camData.renderPostProcessing)
-            return;
-#if UNITY_EDITOR
-        if (string.IsNullOrEmpty(_renderPipelineAssetPath) || _transparencyRenderer.Empty())
-            return;
-#endif
-
-        camData.SetRenderer(rendererIndex);
-    }
-#endif
 #if USING_HDRP
     /// <summary> Prepare the camera data for rendering </summary>
     /// <param name="camData"> Targeted camera data </param>

@@ -2,8 +2,8 @@
   "name": "com.tiogiras.megapint-screenshot",
   "displayName": "MegaPint - Screenshot",
   "author": "Tiogiras",
-  "version": "1.0.2",
-  "unity": "2022.3",
+  "version": "1.0.3",
+  "unity": "6000.2",
   "category": "Tools",
   "description": "Want to take screenshots during development? \n\nThis package allows you to render your in game camera's as well as editor windows. Setup different camera angles and capture different screenshots at runtime from all angles with one button press.",
   "repository": {
