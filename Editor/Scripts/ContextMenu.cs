@@ -33,13 +33,6 @@ internal static partial class ContextMenu
             package = PackageKey.Screenshot, signature = "Window Capture"
         };
 
-#if USING_URP
-        private static readonly MenuItemSignature s_transparencyWizardSignature = new()
-        {
-            package = PackageKey.Screenshot, signature = "Transparency Wizard"
-        };
-#endif
-
         #region Private Methods
 
         [MenuItem(MenuItemPackages + "/Screenshot/Capture Now _F12", false, 100)]
@@ -52,7 +45,7 @@ internal static partial class ContextMenu
         return;
 #endif
 
-            List <CameraCapture> cams = Object.FindObjectsOfType <CameraCapture>().ToList();
+            List <CameraCapture> cams = Object.FindObjectsByType <CameraCapture>(FindObjectsSortMode.InstanceID).ToList();
 
             if (cams.Count == 0)
             {
@@ -80,13 +73,8 @@ internal static partial class ContextMenu
                 var timestamp = $"{DateTime.Now:yy-MM-dd})({DateTime.Now:HH-mm-ss}";
                 var camName = $"/{cam.gameObject.name}[{cam.GetHashCode()}]({timestamp}).png";
                 var path = $"{cam.lastPath}{camName}";
-
-#if USING_URP
-            cam.RenderAndSaveUrp(path, SaveValues.Screenshot.RenderPipelineAssetPath,
-                                 AssetDatabase.GUIDFromAssetPath(SaveValues.Screenshot.RendererDataPath));
-#else
+                
                 cam.RenderAndSave(path);
-#endif
             }
 
             Debug.Log($"{activeCams.Count} CameraCapture components rendered.");
@@ -106,14 +94,6 @@ internal static partial class ContextMenu
         {
             TryOpen <WindowCapture>(false, s_windowCaptureSignature);
         }
-
-#if USING_URP
-        [MenuItem(MenuItemPackages + "/Screenshot/Transparency Wizard", false, 140)]
-        private static void TransparencyWizard()
-        {
-            TryOpen <TransparencyWizard>(true, s_transparencyWizardSignature);
-        }
-#endif
 
         #endregion
     }

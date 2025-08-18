@@ -51,10 +51,6 @@ internal class PackageTests
             ref isValid,
             Constants.Screenshot.UserInterface.ShortcutCaptureItem);
 
-        TestsUtility.ValidateResource <VisualTreeAsset>(
-            ref isValid,
-            Constants.Screenshot.UserInterface.TransparencyWizard);
-
         TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Screenshot.UserInterface.WindowCapture);
         TestsUtility.ValidateResource <VisualTreeAsset>(ref isValid, Constants.Screenshot.UserInterface.CameraCapture);
 

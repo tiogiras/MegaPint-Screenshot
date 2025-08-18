@@ -1,9 +1,5 @@
 ﻿#if UNITY_EDITOR
 using MegaPint.Editor.Scripts.Settings;
-#if USING_URP
-using UnityEditor;
-using UnityEngine.Rendering.Universal;
-#endif
 
 namespace MegaPint.Editor.Scripts
 {
@@ -14,8 +10,6 @@ internal static partial class SaveValues
     public static class Screenshot
     {
         private static CacheValue <string> s_lastEditorWindowPath = new() {defaultValue = "Assets"};
-        private static CacheValue <string> s_pipelineAsset = new() {defaultValue = ""};
-        private static CacheValue <string> s_rendererData = new() {defaultValue = ""};
         private static CacheValue <bool> s_externalExport = new() {defaultValue = false};
 
         private static CacheValue <bool> s_applyPSShortcutWindow = new() {defaultValue = false};
@@ -27,18 +21,6 @@ internal static partial class SaveValues
         {
             get => ValueProperty.Get("lastEditorWindowPath", ref s_lastEditorWindowPath, _Settings);
             set => ValueProperty.Set("lastEditorWindowPath", value, ref s_lastEditorWindowPath, _Settings);
-        }
-
-        public static string RenderPipelineAssetPath
-        {
-            get => ValueProperty.Get("pipelineAsset", ref s_pipelineAsset, _Settings);
-            set => ValueProperty.Set("pipelineAsset", value, ref s_pipelineAsset, _Settings);
-        }
-
-        public static string RendererDataPath
-        {
-            get => ValueProperty.Get("rendererData", ref s_rendererData, _Settings);
-            set => ValueProperty.Set("rendererData", value, ref s_rendererData, _Settings);
         }
 
         public static bool ExternalExport
@@ -69,14 +51,6 @@ internal static partial class SaveValues
                 return null;
             }
         }
-
-#if USING_URP
-    public static UniversalRenderPipelineAsset RenderPipelineAsset()
-    {
-        return AssetDatabase.
-            LoadAssetAtPath <UniversalRenderPipelineAsset>(RenderPipelineAssetPath);
-    }
-#endif
     }
 }
 

@@ -7,9 +7,6 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using GUIUtility = MegaPint.Editor.Scripts.GUI.Utility.GUIUtility;
-#if USING_URP
-using UnityEngine.Rendering.Universal;
-#endif
 
 #if UNITY_EDITOR
 namespace MegaPint.Editor.Scripts.Drawer
@@ -36,10 +33,6 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
     private Button _btnRender;
     private Button _btnSave;
 
-#if USING_URP
-    private UniversalAdditionalCameraData _camData;
-#endif
-
     private DropdownField _depth;
     private IntegerField _height;
     private Label _imageResolution;
@@ -52,11 +45,8 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
     private Texture2D _render;
 
     private CameraCapture _target;
-
-    private VisualElement _transparencyHint;
+    
     private VisualElement _transparencyHintHdrp;
-
-    private VisualElement _rootTarget;
 
 #if USING_HDRP
     private IntegerField _exposureTime;
@@ -73,8 +63,6 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
 #endif
         var template = Resources.Load <VisualTreeAsset>(_basePath);
         VisualElement root = GUIUtility.Instantiate(template);
-
-        _rootTarget = root;
 
         root.style.flexGrow = 1f;
         root.style.flexShrink = 1f;
@@ -98,15 +86,9 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
         _imageType = root.Q <DropdownField>("ImageType");
         _pixelPerUnit = root.Q <FloatField>("PixelPerUnit");
 
-        _transparencyHint = root.Q <VisualElement>("TransparencyHint");
-
         _transparencyHintHdrp = root.Q <VisualElement>("TransparencyHintHDRP");
 
         _target = (CameraCapture)target;
-
-#if USING_URP
-        _camData = _target.GetComponent <Camera>().GetUniversalAdditionalCameraData();
-#endif
 
 #if USING_HDRP
         _exposureTime = root.Q <IntegerField>("ExposureTime");
@@ -127,8 +109,7 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
 #endif
 
         _btnSave.style.display = DisplayStyle.None;
-
-        UpdateTransparencyHint();
+        
         UpdateTransparencyHintHdrp();
 
         UpdatePath();
@@ -272,7 +253,6 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
                 _target.backgroundType = (BackgroundType)evt.newValue;
                 UpdateBackgroundColor();
                 UpdateBackgroundImage();
-                UpdateTransparencyHint();
 
                 ApplyModifiedProperties();
             });
@@ -358,17 +338,12 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
         var height = _target.height;
 
         var gcd = ScreenshotUtility.Gcd((ulong)width, (ulong)height);
-
-#if USING_URP
-        _render = await _target.RenderUrp(SaveValues.Screenshot.RenderPipelineAssetPath,
-            AssetDatabase.GUIDFromAssetPath(SaveValues.Screenshot.RendererDataPath));
-#else
+        
         _render = await _target.Render();
-#endif
 
         _preview.style.backgroundImage = _render;
-        _preview.aspectRatioX = width / gcd;
-        _preview.aspectRatioY = height / gcd;
+        _preview.AspectRatioX = width / gcd;
+        _preview.AspectRatioY = height / gcd;
         _preview.FitToParent();
 
         _btnSave.style.display = DisplayStyle.Flex;
@@ -410,20 +385,6 @@ internal class CameraCaptureDrawer : UnityEditor.Editor
     {
         _path.text = _target.lastPath;
         _path.tooltip = _target.lastPath;
-    }
-
-    /// <summary> Update the transparency hint </summary>
-    private void UpdateTransparencyHint()
-    {
-#if USING_URP
-        if (_target.backgroundType is not BackgroundType.None)
-            _transparencyHint.style.display = _camData.renderPostProcessing ? DisplayStyle.Flex
-                : DisplayStyle.None;
-        else
-            _transparencyHint.style.display = DisplayStyle.None;
-#else
-        _transparencyHint.style.display = DisplayStyle.None;
-#endif
     }
 
     /// <summary> Update the transparency hint of the hdrp pipeline </summary>

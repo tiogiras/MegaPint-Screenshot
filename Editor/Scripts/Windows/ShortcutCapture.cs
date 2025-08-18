@@ -161,7 +161,7 @@ internal class ShortcutCapture : EditorWindowBase
     {
         onRefresh?.Invoke();
 
-        List <CameraCapture> cams = FindObjectsOfType <CameraCapture>().ToList();
+        List <CameraCapture> cams = FindObjectsByType <CameraCapture>(FindObjectsSortMode.InstanceID).ToList();
 
         var hasCams = cams is {Count: > 0};
 
